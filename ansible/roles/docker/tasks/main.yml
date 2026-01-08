@@ -1,0 +1,25 @@
+---
+- name: Install required packages
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+    state: present
+
+- name: Add Docker repository to APT sources
+  ansible.builtin.deb822_repository:
+    name: docker
+    types: deb
+    uris: "{{ docker_linux_debian }}"
+    signed_by: "{{ docker_linux_debian }}/gpg"
+    suites: "{{ ansible_distribution_release }}"
+    components: stable
+
+- name: Install Docker packages
+  ansible.builtin.apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-compose-plugin
+    state: present
+    update_cache: true

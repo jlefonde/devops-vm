@@ -1,0 +1,18 @@
+---
+# Terraform
+# AWS CLI
+# Go
+# Ansible
+# VSCode
+
+- name: Download Go binary
+  ansible.builtin.get_url:
+    url: https://go.dev/dl/go1.25.5.linux-amd64.tar.gz
+    dest: /usr/local/
+
+- name: Update /etc/environment
+  lineinfile:
+    dest: /etc/environment
+    line: "PATH=$PATH:{{ item }}"
+  with_items:
+    - /usr/local/go/bin

@@ -1,0 +1,15 @@
+---
+- hosts: all
+  become: true
+
+  pre_tasks:
+    - name: Update APT package cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+  roles:
+    - vagrant_setup
+    - docker
+
+  
