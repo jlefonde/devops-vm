@@ -9,6 +9,11 @@
       - unzip
       - ca-certificates
       - gpg
+      - jq
+      - build-essential
+      - ncdu
+      - htop
+      - fzf
     state: present
 
 - name: Check if VSCode is installed

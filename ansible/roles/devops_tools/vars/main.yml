@@ -1,3 +1,10 @@
 ---
 go_version: "1.25.5"
 terraform_version: "1.14.3"
+localstack_version: "4.13.0"
+minikube_version: "1.38.0"
+kubectl_version: "1.35.0"
+packer_version: "1.14.3"
+vagrant_version: "2.4.6"
+k9s_version: "0.50.18"
+helm_version: "4.1.0"
