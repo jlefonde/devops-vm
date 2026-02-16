@@ -11,13 +11,13 @@ variable "iso_checksum" {
 variable "output_dir" {
   type        = string
   description = "The directory where the built VM will be stored."
-  default     = "./"
+  default     = "output"
 }
 
 variable "http_dir" {
   type        = string
   description = "The directory to serve HTTP files from during the build."
-  default     = "./http"
+  default     = "http"
 }
 
 variable "hcp_client_id" {

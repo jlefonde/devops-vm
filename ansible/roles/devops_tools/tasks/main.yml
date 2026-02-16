@@ -1,12 +1,4 @@
 ---
-- name: Install required packages
-  ansible.builtin.apt:
-    name:
-      - python3-debian
-      - python3-venv
-      - python3-pip
-    state: present
-
 - name: Check if Go is installed
   ansible.builtin.stat:
     path: /usr/local/go/bin/go
@@ -173,6 +165,7 @@
 - name: Install Ansible using pip
   ansible.builtin.pip:
     name: ansible
+    version: "{{ ansible_version }}"
     virtualenv: /opt/venv
     virtualenv_command: python3 -m venv
 

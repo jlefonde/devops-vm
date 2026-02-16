@@ -1,0 +1,6 @@
+---
+# Customize these values before running vagrant up
+username: myuser        # New username for the VM
+password: changeme      # User password (will be hashed)
+root_password: changeme # Root password (will be hashed)
+ssh_passphrase: ""      # SSH key passphrase (leave empty for no passphrase)

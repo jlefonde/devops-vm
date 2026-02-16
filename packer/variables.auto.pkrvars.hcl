@@ -1,0 +1,6 @@
+iso_url          = "https://cdimage.debian.org/cdimage/archive/12.12.0/amd64/iso-cd/debian-12.12.0-amd64-netinst.iso"
+iso_checksum     = "sha256:dfc30e04fd095ac2c07e998f145e94bb8f7d3a8eca3a631d2eb012398deae531"
+organization     = "jlefonde"
+box_name         = "debian12-devops-desktop"
+box_version      = "1.0.0"
+box_architecture = "amd64"

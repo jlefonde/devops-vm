@@ -1,5 +1,5 @@
 ---
-- name: Install basic utilities
+- name: Install required packages
   ansible.builtin.apt:
     name:
       - vim
@@ -14,6 +14,10 @@
       - ncdu
       - htop
       - fzf
+      - python3-debian
+      - python3-venv
+      - python3-pip
+      - python3-psutil
     state: present
 
 - name: Check if VSCode is installed

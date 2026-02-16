@@ -1,29 +1,41 @@
-- name: Configure dark theme
-  community.general.dconf:
-    key: "/org/gnome/desktop/interface/color-scheme"
-    value: "'prefer-dark'"
-    state: present
+---
+- name: Check if vagrant user exists
+  ansible.builtin.getent:
+    database: passwd
+    key: vagrant
+  failed_when: false
+  register: vagrant_user_check
 
-- name: Configure terminal dark theme
-  community.general.dconf:
-    key: "/org/gnome/terminal/legacy/theme-variant"
-    value: "'dark'"
-    state: present
+- name: Check if target user already exists
+  ansible.builtin.getent:
+    database: passwd
+    key: "{{ username }}"
+  failed_when: false
+  when: vagrant_user_check.ansible_facts.getent_passwd is defined
+  register: target_user_check
 
-- name: Set timezone to match host system
-  community.general.timezone:
-    name: "{{ lookup('ansible.builtin.pipe', 'timedatectl show --property=Timezone --value') }}"
-
-- name: Rename vagrant user
+- name: Rename vagrant user to target username
   ansible.builtin.command:
-    cmd: "usermod -l {{ username }} {{ ansible_user_id }}"
-    ignore_errors: true
+    cmd: "usermod -l {{ username }} -d /home/{{ username }} vagrant"
+  when:
+    - vagrant_user_check.ansible_facts.getent_passwd is defined
+    - target_user_check.ansible_facts.getent_passwd is not defined or username == 'vagrant'
+  register: usermod_result
+  changed_when: usermod_result.rc == 0
 
-- name: Update user
+- name: Update group name if vagrant group exists
+  ansible.builtin.command:
+    cmd: "groupmod -n {{ username }} vagrant"
+  when:
+    - vagrant_user_check.ansible_facts.getent_passwd is defined
+    - target_user_check.ansible_facts.getent_passwd is not defined or username == 'vagrant'
+  register: groupmod_result
+  changed_when: groupmod_result.rc == 0
+  failed_when: false
+
+- name: Ensure target user exists with correct settings
   ansible.builtin.user:
     name: "{{ username }}"
-    home: "/home/{{ username }}"
-    move_home: true
     password: "{{ password | password_hash('sha512') }}"
     generate_ssh_key: true
     ssh_key_bits: 4096
@@ -31,8 +43,27 @@
     ssh_key_passphrase: "{{ ssh_passphrase }}"
     ssh_key_file: ".ssh/id_ed25519"
     shell: /bin/bash
+    append: true
 
 - name: Change root password
   ansible.builtin.user:
     name: root
     password: "{{ root_password | password_hash('sha512') }}"
+
+- name: Configure dark theme
+  community.general.dconf:
+    key: "/org/gnome/desktop/interface/color-scheme"
+    value: "'prefer-dark'"
+    state: present
+  become_user: "{{ username }}"
+
+- name: Configure terminal dark theme
+  community.general.dconf:
+    key: "/org/gnome/terminal/legacy/theme-variant"
+    value: "'dark'"
+    state: present
+  become_user: "{{ username }}"
+
+- name: Set timezone to match host system
+  community.general.timezone:
+    name: "{{ lookup('ansible.builtin.pipe', 'timedatectl show --property=Timezone --value') }}"

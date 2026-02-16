@@ -1,1 +1,2 @@
-*.auto.pkrvars.hcl
+packer/secrets.auto.pkrvars.hcl
+packer/local.auto.pkrvars.hcl

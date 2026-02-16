@@ -23,7 +23,7 @@ source "virtualbox-iso" "debian" {
   ssh_username = "vagrant"
   ssh_password = "vagrant"
 
-  memory = 12288
+  memory = 8192
   cpus = 8
   # TODO: remove
   disk_size = 20480
@@ -37,7 +37,7 @@ source "virtualbox-iso" "debian" {
   gfx_accelerate_3d = true
   shutdown_command = "echo 'vagrant' | sudo -S shutdown -P now"
 
-  http_directory = var.http_dir
+  http_directory = "${path.root}/${var.http_dir}"
   boot_wait = "5s"
   boot_command = [
     "<esc><wait>",
@@ -54,24 +54,24 @@ build {
   sources = ["source.virtualbox-iso.debian"]
 
   provisioner "shell" {
-    script = "../scripts/setup.sh"
+    script = "${path.root}/../scripts/setup.sh"
     execute_command = "echo 'vagrant' | {{ .Vars }} su -c '{{ .Path }}'"
   }
 
   provisioner "shell" {
     only = ["virtualbox-iso.debian"]
-    script = "../scripts/install-vbox-guest-additions.sh"
+    script = "${path.root}/../scripts/install-vbox-guest-additions.sh"
     execute_command = "echo 'vagrant' | {{ .Vars }} su -c '{{ .Path }}'"
   }
 
   provisioner "ansible" {
-    playbook_file = "../ansible/packer.yml"
+    playbook_file = "${path.root}/../ansible/packer.yml"
   }
 
  post-processors {
   post-processor "vagrant" {
     output = "${var.output_dir}/${var.box_name}-{{.Architecture}}-{{.Provider}}.box"
-    vagrantfile_template = "./Vagrantfile.tpl"
+    vagrantfile_template = "${path.root}/Vagrantfile.tpl"
   }
 
   post-processor "vagrant-registry" {
