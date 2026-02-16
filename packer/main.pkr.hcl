@@ -30,7 +30,6 @@ source "virtualbox-iso" "debian" {
 
   ssh_timeout = "10m"
   output_directory = var.output_dir
-  vm_name = "devops-desktop"
 
   gfx_controller = "vmsvga"
   gfx_vram_size = 128
@@ -44,6 +43,8 @@ source "virtualbox-iso" "debian" {
     "install ",
     "auto=true ",
     "priority=critical ",
+    "netcfg/get_hostname=devops-desktop ",
+    "netcfg/get_domain=localdomain ",
     "preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg ",
     "<enter><wait>"
   ]
@@ -66,6 +67,7 @@ build {
 
   provisioner "ansible" {
     playbook_file = "${path.root}/../ansible/packer.yml"
+    user          = "vagrant"
   }
 
  post-processors {
@@ -80,7 +82,6 @@ build {
     architecture  = "${var.box_architecture}"
     client_id     = "${var.hcp_client_id}"
     client_secret = "${var.hcp_client_secret}"
-    no_release    = true
   }
  }
 }
