@@ -4,6 +4,10 @@ packer {
       version = "~> 1"
       source  = "github.com/hashicorp/virtualbox"
     }
+    qemu = {
+      version = "~> 1"
+      source  = "github.com/hashicorp/qemu"
+    }
     ansible = {
       version = "~> 1"
       source = "github.com/hashicorp/ansible"
@@ -22,13 +26,13 @@ source "virtualbox-iso" "debian" {
 
   ssh_username = "vagrant"
   ssh_password = "vagrant"
+  ssh_timeout = "10m"
 
   memory = 8192
   cpus = 8
   # TODO: remove
   disk_size = 20480
 
-  ssh_timeout = "10m"
   output_directory = var.output_dir
 
   gfx_controller = "vmsvga"
@@ -50,9 +54,43 @@ source "virtualbox-iso" "debian" {
   ]
 }
 
+source "qemu" "debian" {
+  iso_url = var.iso_url
+  iso_checksum = var.iso_checksum
+
+  ssh_username      = "vagrant"
+  ssh_password      = "vagrant"
+  ssh_timeout       = "30m"
+
+  memory = 8192
+  cpus = 8
+  # TODO: remove
+  disk_size = 20480
+
+  output_directory  = var.output_dir
+
+  shutdown_command  = "echo 'vagrant' | sudo -S shutdown -P now"
+
+  http_directory    = "${path.root}/${var.http_dir}"
+  boot_wait         = "5s"
+  boot_command = [
+    "<esc><wait>",
+    "install ",
+    "auto=true ",
+    "priority=critical ",
+    "netcfg/get_hostname=devops-desktop ",
+    "netcfg/get_domain=localdomain ",
+    "preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg ",
+    "<enter><wait>"
+  ]
+}
+
 build {
   name = "devops"
-  sources = ["source.virtualbox-iso.debian"]
+  sources = [
+    "source.virtualbox-iso.debian",
+    "source.qemu.debian"
+  ]
 
   provisioner "shell" {
     script = "${path.root}/../scripts/setup.sh"
